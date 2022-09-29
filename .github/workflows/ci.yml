@@ -102,7 +102,7 @@ jobs:
         shell: bash
         run: |
           cd "$BORINGSSL_HOME"
-          git checkout --progress --force -B master
+          git checkout --progress --force -B chromium-stable
 
       - name: Build BoringSSL 64-bit Linux and MacOS
         if: runner.os != 'Windows'
