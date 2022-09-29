@@ -3,9 +3,6 @@ name: Continuous integration
 on:
   push:
   pull_request:
-  schedule:
-    # Run every day at midnight UTC
-    - cron: '0 0 * * *'
 
 jobs:
   boringssl_clone:
@@ -105,7 +102,7 @@ jobs:
         shell: bash
         run: |
           cd "$BORINGSSL_HOME"
-          git checkout --progress --force -B master
+          git checkout --progress --force -B fips-20220613
 
       - name: Build BoringSSL 64-bit Linux and MacOS
         if: runner.os != 'Windows'
