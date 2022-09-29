@@ -1,8 +1,8 @@
 import org.gradle.util.VersionNumber
 
 buildscript {
-    ext.android_tools = 'com.android.tools.build:gradle:3.5.0'
-    ext.errorproneVersion = '2.3.3'
+    ext.android_tools = 'com.android.tools.build:gradle:4.1.0'
+    ext.errorproneVersion = '2.4.0'
     ext.errorproneJavacVersion = '9+181-r4173-1'
     repositories {
         google()
