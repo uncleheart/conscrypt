@@ -896,6 +896,10 @@ public class SSLSocketTest {
                 }
                 for (int i = 0; i < clientHello.cipherSuites.size(); i++) {
                     CipherSuite cipherSuite = clientHello.cipherSuites.get(i);
+                    if(HelloExtension.IsGrease(cipherSuite.code)){
+                        // 忽略
+                        continue;
+                    }
                     cipherSuites[i] = cipherSuite.getAndroidName();
                 }
                 StandardNames.assertDefaultCipherSuites(cipherSuites);

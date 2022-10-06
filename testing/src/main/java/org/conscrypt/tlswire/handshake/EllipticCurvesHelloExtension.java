@@ -39,6 +39,9 @@ public class EllipticCurvesHelloExtension extends HelloExtension {
         supported = new ArrayList<EllipticCurve>(ellipticCurvesListIn.available() / 2);
         while (ellipticCurvesListIn.available() >= 2) {
             int curve_id = in.readUnsignedShort();
+            if (HelloExtension.IsGrease(curve_id)) {
+                continue;
+            }
             supported.add(EllipticCurve.fromIdentifier(curve_id));
         }
     }

@@ -100,4 +100,18 @@ public class HelloExtension {
         return "HelloExtension{type: " + name + ", data: " + new BigInteger(1, data).toString(16)
                 + "}";
     }
+
+    /**
+     * 判断是否为 0x1a1a, 0x2a2a, 0x3a3a  grease
+     *
+     * @param value
+     * @return
+     */
+    public static boolean IsGrease(int value) {
+        if (((value ^ 0x0a0a) & 0x0f0f) == 0x0000 && (value & 0xf000 >> 8) == (value & 0x00f0)) {
+            // 先看看第二四位是否为a  再看一三位是否相同
+            return true;
+        }
+        return false;
+    }
 }

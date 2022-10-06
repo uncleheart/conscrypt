@@ -47,6 +47,7 @@ import javax.net.ssl.SSLHandshakeException;
 import javax.net.ssl.X509KeyManager;
 import javax.net.ssl.X509TrustManager;
 import javax.security.auth.x500.X500Principal;
+
 import org.conscrypt.NativeCrypto.SSLHandshakeCallbacks;
 import org.conscrypt.SSLParametersImpl.AliasChooser;
 import org.conscrypt.SSLParametersImpl.PSKCallbacks;
@@ -290,11 +291,6 @@ final class NativeSsl {
         // certain protocols.
         NativeCrypto.SSL_accept_renegotiations(ssl, this);
 
-        // 设置为固定的加密套件&顺序 ja3
-        NativeCrypto.SSL_set_enable_cipher(ssl, this, new int[]{4865,4866,4867,49195,49199,49196,49200,52393,52392,49171,49172,156,157,47,53});
-        // 设置为固定的扩展&顺序 ja3
-        NativeCrypto.SSL_set_enable_extensions(ssl, this, new int[]{0,23,65281,10,11,35,16,5,13,18,51,45,43,27,17513,21,41});
-
         if (isClient()) {
             NativeCrypto.SSL_set_connect_state(ssl, this);
             /**
@@ -323,6 +319,18 @@ final class NativeSsl {
         NativeCrypto.setEnabledProtocols(ssl, this, parameters.enabledProtocols);
         NativeCrypto.setEnabledCipherSuites(
             ssl, this, parameters.enabledCipherSuites, parameters.enabledProtocols);
+
+        if (parameters.getEnabledCipherValue() != null && parameters.getEnabledCipherValue().length > 0) {
+            // 设置为固定的加密套件&顺序 ja3
+//            NativeCrypto.SSL_set_enable_cipher(ssl, this, new int[]{4865,4866,4867,49195,49199,49196,49200,52393,52392,49171,49172,156,157,47,53});
+            NativeCrypto.SSL_set_enable_cipher(ssl, this, parameters.getEnabledCipherValue());
+        }
+
+        if (parameters.getEnabledExtensionValue() != null && parameters.getEnabledExtensionValue().length > 0) {
+            // 设置为固定的扩展&顺序 ja3
+//        NativeCrypto.SSL_set_enable_extensions(ssl, this, new int[]{0,23,65281,10,11,35,16,5,13,18,51,45,43,27,17513,21,41});
+            NativeCrypto.SSL_set_enable_extensions(ssl, this, parameters.getEnabledExtensionValue());
+        }
 
         if (parameters.applicationProtocols.length > 0) {
             NativeCrypto.setApplicationProtocols(ssl, this, isClient(), parameters.applicationProtocols);

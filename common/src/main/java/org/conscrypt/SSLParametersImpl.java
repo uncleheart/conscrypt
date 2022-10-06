@@ -77,6 +77,10 @@ final class SSLParametersImpl implements Cloneable {
     // The TLS 1.0-1.2 cipher suites enabled for the SSL connection.  TLS 1.3 cipher suites
     // cannot be customized, so for simplicity this field never contains any TLS 1.3 suites.
     String[] enabledCipherSuites;
+    // 启用的加密套件value
+    int[] enabledCipherValue;
+   // 启用的扩展
+    int[] enabledExtensionValue;
 
     // if the peer with this parameters tuned to work in client mode
     private boolean client_mode = true;
@@ -264,6 +268,38 @@ final class SSLParametersImpl implements Cloneable {
         enabledCipherSuites = NativeCrypto.checkEnabledCipherSuites(
                 filterFromCipherSuites(cipherSuites,
                         NativeCrypto.SUPPORTED_TLS_1_3_CIPHER_SUITES_SET));
+    }
+
+    /**
+     * 获取启用的加密套件值
+     * @return
+     */
+    public int[] getEnabledCipherValue() {
+        return enabledCipherValue;
+    }
+
+    /**
+     * 设置启用的加密套件值
+     * @return
+     */
+    public void setEnabledCipherValue(int[] enabledCipherValue) {
+        this.enabledCipherValue = enabledCipherValue;
+    }
+
+    /**
+     * 获取启用的扩展值
+     * @return
+     */
+    public int[] getEnabledExtensionValue() {
+        return enabledExtensionValue;
+    }
+
+    /**
+     * 设置启用的扩展值
+     * @return
+     */
+    public void setEnabledExtensionValue(int[] enabledExtensionValue) {
+        this.enabledExtensionValue = enabledExtensionValue;
     }
 
     /**
