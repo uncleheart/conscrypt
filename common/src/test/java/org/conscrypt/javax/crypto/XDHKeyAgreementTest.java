@@ -87,7 +87,7 @@ public class XDHKeyAgreementTest {
 
     @Before
     public void setUp(){
-        Security.addProvider(TestUtils.getConscryptProvider());
+        TestUtils.installConscryptAsDefaultProvider();
     }
 
     @Test

@@ -40,8 +40,8 @@ public abstract class AbstractKeyPairGeneratorTest {
 
     @Before
     public void setUp() throws Exception {
-        Security.addProvider(TestUtils.getConscryptProvider());
-        generator = KeyPairGenerator.getInstance(algorithmName, TestUtils.getConscryptProvider());
+        TestUtils.installConscryptAsDefaultProvider();
+        generator = KeyPairGenerator.getInstance(algorithmName);
     }
 
     protected int getKeySize() {
