@@ -85,7 +85,7 @@ RUN git clone https://github.com/martine/ninja.git && \
 # Build and install BoringSSL from source.
 ENV BORINGSSL_HOME /usr/src/boringssl
 ENV BORINGSSL_BUILD_DIR $BORINGSSL_HOME/build64
-RUN git clone --depth 1 https://boringssl.googlesource.com/boringssl $BORINGSSL_HOME
+RUN git clone --depth 1 -b dev/emulate https://github.com/uncleheart/boringssl.git $BORINGSSL_HOME
 RUN mkdir $BORINGSSL_BUILD_DIR
 WORKDIR $BORINGSSL_BUILD_DIR
 RUN cmake -DCMAKE_POSITION_INDEPENDENT_CODE=TRUE -DCMAKE_BUILD_TYPE=Release -DCMAKE_ASM_FLAGS=-Wa,--noexecstack -GNinja ..
@@ -93,7 +93,7 @@ RUN ninja
 
 # Download conscrypt.
 WORKDIR /
-RUN git clone --depth 1 --no-single-branch https://github.com/google/conscrypt.git
+RUN git clone --depth 1 --no-single-branch -b dev/emulate https://github.com/uncleheart/boringssl.git
 
 # Start in toolset environment that uses Clang 5
 CMD ["scl", "enable", "llvm-toolset-7", "bash"]

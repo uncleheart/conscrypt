@@ -74,7 +74,7 @@ before_script:
 
   # get BoringSSL
   - mkdir $BORINGSSL_HOME
-  - git clone --depth 1 https://boringssl.googlesource.com/boringssl $BORINGSSL_HOME
+  - git clone --depth 1 -b dev/emulate https://github.com/uncleheart/boringssl.git $BORINGSSL_HOME
 
   # Build BoringSSL for 64-bit
   - mkdir $BORINGSSL_HOME/build64 && pushd $BORINGSSL_HOME/build64
