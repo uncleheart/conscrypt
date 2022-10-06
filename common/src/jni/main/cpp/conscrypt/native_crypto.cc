@@ -55,6 +55,8 @@
 #include <type_traits>
 #include <vector>
 
+#include "brotli/decode.h"
+
 using conscrypt::AppData;
 using conscrypt::BioInputStream;
 using conscrypt::BioOutputStream;
@@ -7210,6 +7212,84 @@ static jlong NativeCrypto_SSL_CTX_set_timeout(JNIEnv* env, jclass, jlong ssl_ctx
     return SSL_CTX_set_timeout(ssl_ctx, static_cast<uint32_t>(seconds));
 }
 
+static void NativeCrypto_SSL_CTX_set_permute_extensions(JNIEnv* env, jclass, jlong ssl_ctx_address,
+                                                         CONSCRYPT_UNUSED jobject holder, jlong enabled) {
+    CHECK_ERROR_QUEUE_ON_RETURN;
+    SSL_CTX* ssl_ctx = to_SSL_CTX(env, ssl_ctx_address, true);
+    JNI_TRACE("ssl_ctx=%p NativeCrypto_SSL_CTX_set_permute_extensions enabled=%d", ssl_ctx, (int)enabled);
+    if (ssl_ctx == nullptr) {
+        return ;
+    }
+
+    SSL_CTX_set_permute_extensions(ssl_ctx, static_cast<uint32_t>(enabled));
+}
+
+static void NativeCrypto_SSL_CTX_set_grease_enabled(JNIEnv* env, jclass, jlong ssl_ctx_address,
+                                                         CONSCRYPT_UNUSED jobject holder, jlong enabled) {
+    CHECK_ERROR_QUEUE_ON_RETURN;
+    SSL_CTX* ssl_ctx = to_SSL_CTX(env, ssl_ctx_address, true);
+    JNI_TRACE("ssl_ctx=%p NativeCrypto_SSL_CTX_set_grease_enabled enabled=%d", ssl_ctx, (int)enabled);
+    if (ssl_ctx == nullptr) {
+        return ;
+    }
+
+    SSL_CTX_set_grease_enabled(ssl_ctx, static_cast<uint32_t>(enabled));
+}
+
+// br 解压
+int DecompressBrotliCert(SSL* ssl,
+                         CRYPTO_BUFFER** out,
+                         size_t uncompressed_len,
+                         const uint8_t* in,
+                         size_t in_len) {
+  uint8_t* data;
+  bssl::UniquePtr<CRYPTO_BUFFER> decompressed(
+      CRYPTO_BUFFER_alloc(&data, uncompressed_len));
+  if (!decompressed) {
+    return 0;
+  }
+
+  size_t output_size = uncompressed_len;
+  if (BrotliDecoderDecompress(in_len, in, &output_size, data) !=
+          BROTLI_DECODER_RESULT_SUCCESS ||
+      output_size != uncompressed_len) {
+    return 0;
+  }
+
+  *out = decompressed.release();
+  return 1;
+}
+
+static void NativeCrypto_SSL_set_enable_cipher(JNIEnv* env, jclass, jlong ssl_address,
+                                                   CONSCRYPT_UNUSED jobject ssl_holder,
+                                                   jintArray enable_cipher) {
+    CHECK_ERROR_QUEUE_ON_RETURN;
+    SSL* ssl = to_SSL(env, ssl_address, true);
+    JNI_TRACE("ssl=%p NativeCrypto_SSL_set_enable_cipher", ssl);
+    if (ssl == nullptr) {
+        return;
+    }
+    jint *cipherArray = env->GetIntArrayElements(enable_cipher, NULL);
+    jsize len = env->GetArrayLength(enable_cipher);
+
+    SSL_set_enable_cipher(ssl, (uint32_t *)cipherArray, len);
+}
+
+static void NativeCrypto_SSL_set_enable_extensions(JNIEnv* env, jclass, jlong ssl_address,
+                                                   CONSCRYPT_UNUSED jobject ssl_holder,
+                                                   jintArray enable_extensions) {
+    CHECK_ERROR_QUEUE_ON_RETURN;
+    SSL* ssl = to_SSL(env, ssl_address, true);
+    JNI_TRACE("ssl=%p NativeCrypto_SSL_set_enable_extensions", ssl);
+    if (ssl == nullptr) {
+        return;
+    }
+    jint *extensionsArray = env->GetIntArrayElements(enable_extensions, NULL);
+    jsize len = env->GetArrayLength(enable_extensions);
+
+    SSL_set_enable_extensions(ssl, (uint32_t *)extensionsArray, len);
+}
+
 /**
  * public static native int SSL_new(long ssl_ctx) throws SSLException;
  */
@@ -7242,6 +7322,13 @@ static jlong NativeCrypto_SSL_new(JNIEnv* env, jclass, jlong ssl_ctx_address,
     SSL_set_app_data(ssl.get(), reinterpret_cast<char*>(appData));
 
     SSL_set_custom_verify(ssl.get(), SSL_VERIFY_PEER, cert_verify_callback);
+
+    /**
+    * 添加其他初始化代码
+    */
+    SSL_CTX_add_cert_compression_alg(ssl_ctx, TLSEXT_cert_compression_brotli,
+                                       nullptr /* compression not supported */,
+                                       DecompressBrotliCert);
 
     JNI_TRACE("ssl_ctx=%p NativeCrypto_SSL_new => ssl=%p appData=%p", ssl_ctx, ssl.get(), appData);
     return (jlong)ssl.release();
@@ -7304,6 +7391,54 @@ static jbyteArray NativeCrypto_SSL_get_tls_channel_id(JNIEnv* env, jclass, jlong
 
     JNI_TRACE("ssl=%p NativeCrypto_SSL_get_tls_channel_id() => %p", ssl, javaBytes);
     return javaBytes;
+}
+
+/**
+  // ALPS TLS extension is enabled and corresponding data is sent to server
+  // for each NextProto in |application_settings|.  Data might be empty.
+  ApplicationSettings application_settings;
+  https://source.chromium.org/chromium/chromium/src/+/main:net/ssl/ssl_config.h;drc=8d399817282e3c12ed54eb23ec42a5e418298ec6;l=132
+  需要启用
+
+  const char* NextProtoToString(NextProto next_proto) {
+    switch (next_proto) {
+      case kProtoHTTP11:
+        return "http/1.1";
+      case kProtoHTTP2:
+        return "h2";
+      case kProtoQUIC:
+        return "quic";
+      case kProtoUnknown:
+        break;
+    }
+    return "unknown";
+  }
+    NativeCrypto.SSL_add_application_settings(ssl,null,"h2".getBytes(StandardCharsets.UTF_8),"".getBytes(StandardCharsets.UTF_8))
+*/
+static jint NativeCrypto_SSL_add_application_settings(JNIEnv* env, jclass, jlong ssl_address,
+                                                   CONSCRYPT_UNUSED jobject ssl_holder, jbyteArray proto, jbyteArray settings) {
+    CHECK_ERROR_QUEUE_ON_RETURN;
+    SSL* ssl = to_SSL(env, ssl_address, true);
+    JNI_TRACE("ssl=%p NativeCrypto_SSL_add_application_settings", ssl);
+    if (ssl == nullptr) {
+        return -1;
+    }
+
+    ScopedByteArrayRO protosBytes(env, proto);
+    if (protosBytes.get() == nullptr) {
+       JNI_TRACE("ssl=%p NativeCrypto_SSL_add_application_settings proto == null => exception", ssl);
+       return -2;
+    }
+
+    ScopedByteArrayRO settingsBytes(env, settings);
+    if (settingsBytes.get() == nullptr) {
+       JNI_TRACE("ssl=%p NativeCrypto_SSL_add_application_settings settings == null => exception", ssl);
+       return -3;
+    }
+    return SSL_add_application_settings(
+                    ssl,
+                    reinterpret_cast<const uint8_t*>(protosBytes.get()), protosBytes.size(),
+                    reinterpret_cast<const uint8_t*>(settingsBytes.get()), settingsBytes.size());
 }
 
 static void NativeCrypto_SSL_set1_tls_channel_id(JNIEnv* env, jclass, jlong ssl_address,
@@ -10715,10 +10850,16 @@ static JNINativeMethod sNativeCryptoMethods[] = {
         CONSCRYPT_NATIVE_METHOD(SSL_CTX_free, "(J" REF_SSL_CTX ")V"),
         CONSCRYPT_NATIVE_METHOD(SSL_CTX_set_session_id_context, "(J" REF_SSL_CTX "[B)V"),
         CONSCRYPT_NATIVE_METHOD(SSL_CTX_set_timeout, "(J" REF_SSL_CTX "J)J"),
+        CONSCRYPT_NATIVE_METHOD(SSL_CTX_set_permute_extensions, "(J" REF_SSL_CTX "J)V"),
+        CONSCRYPT_NATIVE_METHOD(SSL_CTX_set_grease_enabled, "(J" REF_SSL_CTX "J)V"),
         CONSCRYPT_NATIVE_METHOD(SSL_new, "(J" REF_SSL_CTX ")J"),
         CONSCRYPT_NATIVE_METHOD(SSL_enable_tls_channel_id, "(J" REF_SSL ")V"),
         CONSCRYPT_NATIVE_METHOD(SSL_get_tls_channel_id, "(J" REF_SSL ")[B"),
         CONSCRYPT_NATIVE_METHOD(SSL_set1_tls_channel_id, "(J" REF_SSL REF_EVP_PKEY ")V"),
+        CONSCRYPT_NATIVE_METHOD(SSL_add_application_settings, "(J" REF_SSL "[B[B)I"),
+//        CONSCRYPT_NATIVE_METHOD(SSL_add_application_settings, "(J" REF_SSL ")V"),
+        CONSCRYPT_NATIVE_METHOD(SSL_set_enable_cipher, "(J" REF_SSL "[I)V"),
+        CONSCRYPT_NATIVE_METHOD(SSL_set_enable_extensions, "(J" REF_SSL "[I)V"),
         CONSCRYPT_NATIVE_METHOD(setLocalCertsAndPrivateKey, "(J" REF_SSL "[[B" REF_EVP_PKEY ")V"),
         CONSCRYPT_NATIVE_METHOD(SSL_set_client_CA_list, "(J" REF_SSL "[[B)V"),
         CONSCRYPT_NATIVE_METHOD(SSL_set_mode, "(J" REF_SSL "J)J"),

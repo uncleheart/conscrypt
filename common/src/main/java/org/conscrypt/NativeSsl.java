@@ -290,9 +290,17 @@ final class NativeSsl {
         // certain protocols.
         NativeCrypto.SSL_accept_renegotiations(ssl, this);
 
+        // 设置为固定的加密套件&顺序 ja3
+        NativeCrypto.SSL_set_enable_cipher(ssl, this, new int[]{4865,4866,4867,49195,49199,49196,49200,52393,52392,49171,49172,156,157,47,53});
+        // 设置为固定的扩展&顺序 ja3
+        NativeCrypto.SSL_set_enable_extensions(ssl, this, new int[]{0,23,65281,10,11,35,16,5,13,18,51,45,43,27,17513,21,41});
+
         if (isClient()) {
             NativeCrypto.SSL_set_connect_state(ssl, this);
-
+            /**
+             * 开启扩展 "application_settings (17513)"
+             */
+            NativeCrypto.SSL_add_application_settings(ssl, this, "h2".getBytes(StandardCharsets.UTF_8), "".getBytes(StandardCharsets.UTF_8));
             // Configure OCSP and CT extensions for client
             NativeCrypto.SSL_enable_ocsp_stapling(ssl, this);
             if (parameters.isCTVerificationEnabled(hostname)) {

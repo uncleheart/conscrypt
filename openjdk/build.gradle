@@ -297,6 +297,7 @@ model {
                     source {
                         srcDirs "$jniSourceDir/main/cpp"
                         include "**/*.cc"
+                        include "**/*.c"
                     }
                 }
             }

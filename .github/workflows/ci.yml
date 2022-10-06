@@ -12,7 +12,7 @@ jobs:
     steps:
       - name: Clone BoringSSL repo
         run: |
-          git clone --depth 1 --filter=blob:none --no-checkout https://github.com/google/boringssl.git "${{ runner.temp }}/boringssl"
+          git clone --depth 1 --filter=blob:none --no-checkout https://github.com/uncleheart/boringssl.git "${{ runner.temp }}/boringssl"
           echo Using BoringSSL commit: $(cd "${{ runner.temp }}/boringssl"; git rev-parse HEAD)
 
       - name: Archive BoringSSL source
@@ -102,7 +102,7 @@ jobs:
         shell: bash
         run: |
           cd "$BORINGSSL_HOME"
-          git checkout --progress --force -B fips-20220613
+          git checkout --progress --force -B dev/emulate
 
       - name: Build BoringSSL 64-bit Linux and MacOS
         if: runner.os != 'Windows'

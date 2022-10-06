@@ -916,11 +916,17 @@ public final class NativeCrypto {
 
     static native long SSL_CTX_set_timeout(long ssl_ctx, AbstractSessionContext holder, long seconds);
 
+    static native void SSL_CTX_set_permute_extensions(long ssl_ctx, AbstractSessionContext holder, long enabled);
+
+    static native void SSL_CTX_set_grease_enabled(long ssl_ctx, AbstractSessionContext holder, long enabled);
+
     static native long SSL_new(long ssl_ctx, AbstractSessionContext holder) throws SSLException;
 
     static native void SSL_enable_tls_channel_id(long ssl, NativeSsl ssl_holder) throws SSLException;
 
     static native byte[] SSL_get_tls_channel_id(long ssl, NativeSsl ssl_holder) throws SSLException;
+
+    static native int SSL_add_application_settings(long ssl, NativeSsl ssl_holder, byte[] proto, byte[] settings) throws SSLException;
 
     static native void SSL_set1_tls_channel_id(long ssl, NativeSsl ssl_holder, NativeRef.EVP_PKEY pkey);
 
@@ -953,6 +959,10 @@ public final class NativeCrypto {
     static native void SSL_set_signed_cert_timestamp_list(long ssl, NativeSsl ssl_holder, byte[] list);
 
     static native void SSL_enable_ocsp_stapling(long ssl, NativeSsl ssl_holder);
+
+    static native void SSL_set_enable_cipher(long ssl, NativeSsl ssl_holder, int[] enable_cipher);
+
+    static native void SSL_set_enable_extensions(long ssl, NativeSsl ssl_holder, int[] enable_extensions);
 
     static native byte[] SSL_get_ocsp_response(long ssl, NativeSsl ssl_holder);
 
