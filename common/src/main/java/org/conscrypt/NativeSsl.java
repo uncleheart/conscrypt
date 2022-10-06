@@ -296,7 +296,7 @@ final class NativeSsl {
             /**
              * 开启扩展 "application_settings (17513)"
              */
-            NativeCrypto.SSL_add_application_settings(ssl, this, "h2".getBytes(StandardCharsets.UTF_8), "".getBytes(StandardCharsets.UTF_8));
+            NativeCrypto.SSL_add_application_settings(ssl, this, "h2".getBytes(), "".getBytes());
             // Configure OCSP and CT extensions for client
             NativeCrypto.SSL_enable_ocsp_stapling(ssl, this);
             if (parameters.isCTVerificationEnabled(hostname)) {
