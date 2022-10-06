@@ -20,6 +20,9 @@ import static org.junit.Assert.assertNotNull;
 
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
+import java.security.Security;
+
+import org.conscrypt.TestUtils;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -37,7 +40,8 @@ public abstract class AbstractKeyPairGeneratorTest {
 
     @Before
     public void setUp() throws Exception {
-        generator = KeyPairGenerator.getInstance(algorithmName);
+        Security.addProvider(TestUtils.getConscryptProvider());
+        generator = KeyPairGenerator.getInstance(algorithmName, TestUtils.getConscryptProvider());
     }
 
     protected int getKeySize() {

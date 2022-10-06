@@ -35,11 +35,7 @@ import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -47,6 +43,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import javax.net.ssl.KeyManager;
@@ -902,7 +899,11 @@ public class SSLSocketTest {
                     }
                     cipherSuites[i] = cipherSuite.getAndroidName();
                 }
-                StandardNames.assertDefaultCipherSuites(cipherSuites);
+                /**
+                 * 清理空元素
+                 */
+                List<String> collect = Arrays.stream(cipherSuites).filter(Objects::nonNull).collect(Collectors.toList());
+                StandardNames.assertDefaultCipherSuites(collect.toArray(new String[collect.size()]));
             }
         }, getSSLSocketFactoriesToTest());
     }

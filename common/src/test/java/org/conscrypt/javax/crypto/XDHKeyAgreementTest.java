@@ -10,6 +10,9 @@ import java.security.Security;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import javax.crypto.KeyAgreement;
+
+import org.conscrypt.TestUtils;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -80,6 +83,11 @@ public class XDHKeyAgreementTest {
 
         rfc7748X25519PrivateKey = kf.generatePrivate(new PKCS8EncodedKeySpec(privateKey));
         rfc7748X25519PublicKey = kf.generatePublic(new X509EncodedKeySpec(RFC_7748_X25519_THEIR_PUB_KEY));
+    }
+
+    @Before
+    public void setUp(){
+        Security.addProvider(TestUtils.getConscryptProvider());
     }
 
     @Test
