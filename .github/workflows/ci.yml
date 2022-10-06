@@ -12,7 +12,7 @@ jobs:
     steps:
       - name: Clone BoringSSL repo
         run: |
-          git clone --depth 1 --filter=blob:none --no-checkout https://github.com/uncleheart/boringssl.git "${{ runner.temp }}/boringssl"
+          git clone --depth 1 --filter=blob:none -b dev/emulate https://github.com/uncleheart/boringssl.git "${{ runner.temp }}/boringssl"
           echo Using BoringSSL commit: $(cd "${{ runner.temp }}/boringssl"; git rev-parse HEAD)
 
       - name: Archive BoringSSL source
