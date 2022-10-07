@@ -7260,6 +7260,9 @@ int DecompressBrotliCert(SSL* ssl,
   return 1;
 }
 
+/**
+* void SSL_set_enable_cipher(SSL *ssl, uint32_t* enable_cipher, size_t length);
+*/
 static void NativeCrypto_SSL_set_enable_cipher(JNIEnv* env, jclass, jlong ssl_address,
                                                    CONSCRYPT_UNUSED jobject ssl_holder,
                                                    jintArray enable_cipher) {
@@ -7275,6 +7278,9 @@ static void NativeCrypto_SSL_set_enable_cipher(JNIEnv* env, jclass, jlong ssl_ad
     SSL_set_enable_cipher(ssl, (uint32_t *)cipherArray, len);
 }
 
+/**
+* void SSL_set_enable_extensions(SSL *ssl, uint32_t* enable_extensions, size_t length);
+*/
 static void NativeCrypto_SSL_set_enable_extensions(JNIEnv* env, jclass, jlong ssl_address,
                                                    CONSCRYPT_UNUSED jobject ssl_holder,
                                                    jintArray enable_extensions) {
@@ -10857,7 +10863,6 @@ static JNINativeMethod sNativeCryptoMethods[] = {
         CONSCRYPT_NATIVE_METHOD(SSL_get_tls_channel_id, "(J" REF_SSL ")[B"),
         CONSCRYPT_NATIVE_METHOD(SSL_set1_tls_channel_id, "(J" REF_SSL REF_EVP_PKEY ")V"),
         CONSCRYPT_NATIVE_METHOD(SSL_add_application_settings, "(J" REF_SSL "[B[B)I"),
-//        CONSCRYPT_NATIVE_METHOD(SSL_add_application_settings, "(J" REF_SSL ")V"),
         CONSCRYPT_NATIVE_METHOD(SSL_set_enable_cipher, "(J" REF_SSL "[I)V"),
         CONSCRYPT_NATIVE_METHOD(SSL_set_enable_extensions, "(J" REF_SSL "[I)V"),
         CONSCRYPT_NATIVE_METHOD(setLocalCertsAndPrivateKey, "(J" REF_SSL "[[B" REF_EVP_PKEY ")V"),
