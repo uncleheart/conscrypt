@@ -34,7 +34,7 @@ import javax.net.ssl.SSLSocketFactory;
  * <p/>This name of this class cannot change in order to maintain backward-compatibility with GMS
  * core {@code ProviderInstallerImpl}
  */
-final class OpenSSLSocketFactoryImpl extends SSLSocketFactory {
+final public class OpenSSLSocketFactoryImpl extends SSLSocketFactory {
     private static boolean useEngineSocketByDefault = SSLUtils.USE_ENGINE_SOCKET_BY_DEFAULT;
 
     private final SSLParametersImpl sslParameters;
@@ -172,5 +172,9 @@ final class OpenSSLSocketFactoryImpl extends SSLSocketFactory {
         } catch (RuntimeException re) {
             return false;
         }
+    }
+
+    public SSLParametersImpl getSslParameters() {
+        return sslParameters;
     }
 }

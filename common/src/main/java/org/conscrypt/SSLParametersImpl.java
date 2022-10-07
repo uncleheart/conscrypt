@@ -47,7 +47,7 @@ import javax.security.auth.x500.X500Principal;
  * and controls whether new SSL sessions may be established by this
  * socket or not.
  */
-final class SSLParametersImpl implements Cloneable {
+final public class SSLParametersImpl implements Cloneable {
 
     // default source of X.509 certificate based authentication keys
     private static volatile X509KeyManager defaultX509KeyManager;
@@ -195,6 +195,11 @@ final class SSLParametersImpl implements Cloneable {
         this.useSessionTickets = sslParams.useSessionTickets;
         this.useSni = sslParams.useSni;
         this.channelIdEnabled = sslParams.channelIdEnabled;
+
+        this.enabledCipherValue =
+                (sslParams.enabledCipherValue == null) ? null : sslParams.enabledCipherValue.clone();
+        this.enabledExtensionValue =
+                (sslParams.enabledExtensionValue == null) ? null : sslParams.enabledExtensionValue.clone();
     }
 
     static SSLParametersImpl getDefault() throws KeyManagementException {
@@ -272,7 +277,7 @@ final class SSLParametersImpl implements Cloneable {
 
     /**
      * 获取启用的加密套件值
-     * @return
+     * @return 启用的加密套件值
      */
     public int[] getEnabledCipherValue() {
         return enabledCipherValue;
@@ -280,7 +285,6 @@ final class SSLParametersImpl implements Cloneable {
 
     /**
      * 设置启用的加密套件值
-     * @return
      */
     public void setEnabledCipherValue(int[] enabledCipherValue) {
         this.enabledCipherValue = enabledCipherValue;
@@ -288,7 +292,7 @@ final class SSLParametersImpl implements Cloneable {
 
     /**
      * 获取启用的扩展值
-     * @return
+     * @return 启用的扩展值
      */
     public int[] getEnabledExtensionValue() {
         return enabledExtensionValue;
@@ -296,7 +300,6 @@ final class SSLParametersImpl implements Cloneable {
 
     /**
      * 设置启用的扩展值
-     * @return
      */
     public void setEnabledExtensionValue(int[] enabledExtensionValue) {
         this.enabledExtensionValue = enabledExtensionValue;
