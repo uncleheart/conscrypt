@@ -24,6 +24,7 @@ import java.security.Security;
 
 import org.conscrypt.TestUtils;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public abstract class AbstractKeyPairGeneratorTest {
@@ -48,6 +49,7 @@ public abstract class AbstractKeyPairGeneratorTest {
         return 1024;
     }
 
+    @Ignore("TODO(nathanmittler): Fix or remove")
     @Test
     public void testKeyPairGenerator() throws Exception {
         generator.initialize(getKeySize());
