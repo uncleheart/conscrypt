@@ -7,7 +7,7 @@ on:
 jobs:
   boringssl_clone:
     # This step ensures that all builders have the same version of BoringSSL
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
 
     steps:
       - name: Clone BoringSSL repo
@@ -27,9 +27,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform: [ubuntu-18.04, macos-latest, windows-latest]
+        platform: [ubuntu-latest, macos-latest, windows-latest]
         include:
-          - platform: ubuntu-18.04
+          - platform: ubuntu-latest
             tools_url: https://dl.google.com/android/repository/sdk-tools-linux-4333796.zip
           - platform: macos-latest
             tools_url: https://dl.google.com/android/repository/sdk-tools-darwin-4333796.zip
@@ -199,7 +199,7 @@ jobs:
   uberjar:
     needs: build
 
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v2
@@ -266,7 +266,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform: [ubuntu-18.04, macos-latest, windows-latest]
+        platform: [ubuntu-latest, macos-latest, windows-latest]
         java: [8, 9, 11]
         include:
           - java: 8
