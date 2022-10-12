@@ -136,6 +136,9 @@ static BROTLI_INLINE double FastLog2(size_t v) {
    * function defined, so we use log() and a multiplication instead. */
   return log((double)v) * LOG_2_INV;
 #else
+  #if defined(__linux__) 
+  __asm__(".symver log2, log2@GLIBC_2.2.5");
+  #endif
   return log2((double)v);
 #endif
 }
