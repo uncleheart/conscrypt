@@ -140,8 +140,8 @@ static BROTLI_INLINE double FastLog2(size_t v) {
    * 只有为linux下，才需要指定一个低的glibc版本，避免编译使用了高版本glibc导致使用时机器没有对应版本glibc从而报错
   */
   #if defined(__linux__)
-    #if defined(__ANDROID_API__) || defined(__ANDROID__)  || defined(ANDROID)
-    #else 
+    #if defined(__ANDROID_API__) || defined(__ANDROID__)  || defined(ANDROID) || defined(__ANDROID_MIN_SDK_VERSION__)
+    #else
     __asm__(".symver log2, log2@GLIBC_2.2.5");
     #endif
   #endif

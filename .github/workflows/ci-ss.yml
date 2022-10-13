@@ -51,8 +51,8 @@ jobs:
 
       - name: Set runner-specific environment variables
         shell: bash
+        # echo "ANDROID_HOME=${{ runner.temp }}/android-sdk" >> $GITHUB_ENV
         run: |
-          echo "ANDROID_HOME=${{ runner.temp }}/android-sdk" >> $GITHUB_ENV
           echo "BORINGSSL_HOME=${{ runner.temp }}/boringssl" >> $GITHUB_ENV
           echo "SDKMANAGER=${{ runner.temp }}/android-sdk/tools/bin/sdkmanager" >> $GITHUB_ENV
           echo "M2_REPO=${{ runner.temp }}/m2" >> $GITHUB_ENV
@@ -144,22 +144,22 @@ jobs:
           ninja
           cd ..
 
-      - name: Setup Android environment
-        shell: bash
-        if: runner.os == 'Linux'
-        run: |
-          cd "${{ runner.temp }}"
-          curl -L "${{ matrix.tools_url }}" -o android-tools.zip
-          mkdir -p "$ANDROID_HOME"
-          unzip -q android-tools.zip -d "$ANDROID_HOME"
-          yes | "$SDKMANAGER" --licenses || true
-          "$SDKMANAGER" tools | tr '\r' '\n' | uniq
-          "$SDKMANAGER" platform-tools | tr '\r' '\n' | uniq
-          "$SDKMANAGER" 'build-tools;28.0.3' | tr '\r' '\n' | uniq
-          "$SDKMANAGER" 'platforms;android-26' | tr '\r' '\n' | uniq
-          "$SDKMANAGER" 'extras;android;m2repository' | tr '\r' '\n' | uniq
-          "$SDKMANAGER" 'ndk;21.3.6528147' | tr '\r' '\n' | uniq
-          "$SDKMANAGER" 'cmake;3.10.2.4988404' | tr '\r' '\n' | uniq
+      # - name: Setup Android environment
+      #   shell: bash
+      #   if: runner.os == 'Linux'
+      #   run: |
+      #     cd "${{ runner.temp }}"
+      #     curl -L "${{ matrix.tools_url }}" -o android-tools.zip
+      #     mkdir -p "$ANDROID_HOME"
+      #     unzip -q android-tools.zip -d "$ANDROID_HOME"
+      #     yes | "$SDKMANAGER" --licenses || true
+      #     "$SDKMANAGER" tools | tr '\r' '\n' | uniq
+      #     "$SDKMANAGER" platform-tools | tr '\r' '\n' | uniq
+      #     "$SDKMANAGER" 'build-tools;28.0.3' | tr '\r' '\n' | uniq
+      #     "$SDKMANAGER" 'platforms;android-26' | tr '\r' '\n' | uniq
+      #     "$SDKMANAGER" 'extras;android;m2repository' | tr '\r' '\n' | uniq
+      #     "$SDKMANAGER" 'ndk;21.3.6528147' | tr '\r' '\n' | uniq
+      #     "$SDKMANAGER" 'cmake;3.10.2.4988404' | tr '\r' '\n' | uniq
 
       - name: Build with Gradle
         shell: bash
